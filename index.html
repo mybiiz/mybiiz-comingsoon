@@ -225,11 +225,12 @@
 			
 			<div id="cspio-description">Bersiaplah! Kami akan segera hadir!</div>			    				
 			
-			<form id="cspio-form" action="" method="post">
+			<!-- <form id="cspio-form" action="" method="post"> -->
+			<form>
 				<div id="cspio-field-wrapper">
 					<div class="row">
 						<div class="col-md-12 seperate"><div class="input-group"><input id="cspio-email" name="EMAIL" class="form-control input-lg form-el" type="email" placeholder="Email" required/>
-					<span class="input-group-btn"><button id="cspio-subscribe-btn" type="submit" class="btn btn-lg btn-primary form-el noglow">Beri tahu saya!</button></span></div></div>
+						<span class="input-group-btn"><button id="cspio-subscribe-btn" type="submit" class="btn btn-lg btn-primary form-el noglow">Beri tahu saya!</button></span></div></div>
 					</div>
 				</div>
 			</form>
@@ -261,6 +262,40 @@
 				}
 			}
 		);
+
+		// I added redirect script here
+
+		// Email regex (taken from https://emailregex.com)
+		const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+
+		document.querySelector('#cspio-subscribe-btn').addEventListener('click', async e => {
+			e.preventDefault()
+
+			const email = document.querySelector('#cspio-email').value
+			const apiUrl = 'http://localhost:8080'
+
+			if (!email) {
+				alert('Please fill out email field!')
+			} else if (email && !email.match(emailRegex)) {
+				alert('Email not valid!')
+			} else {
+				// POST to server
+				try {
+					const response = await fetch (`${apiUrl}/coming-soon-emails`, {
+						method: 'post',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({ email: email })
+					})
+
+					if (response.status !== 200) throw 'Error saving email'
+
+					window.location.href = '/thankyou.html'
+				} catch (e) {
+					alert ('Error adding your email. Please try again!')
+				}	
+			}
+		})
+		
 	</script>
 
 	</body>
